@@ -1,4 +1,10 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+import Foundation
+let app = App.shared
+let io: IOInterface = TerminalInterface.shared
 
-print("Hello, world!")
+app.register(option: BurgerMenu())
+app.register(option: FrozenCustardMenu())
+app.register(option: DrinkMenu())
+app.register(option: BeerMenu())
+
+app.run(io: io)
