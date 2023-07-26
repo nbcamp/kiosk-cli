@@ -1,18 +1,31 @@
 import Foundation
 
 class App {
-    static let shared = App()
+    let viewer: Viewer
+    let orderService: OrderService
+    var options: [Option] = []
 
-    func run(viewer: Viewer, options: [Option]) {
-        while true {
-            guard let option = viewer.selectMenu(
-                title: "SHAKESHACK MENU",
-                options: options
-            ) else { return }
-
-            print(option.info)
-        }
+    init(
+        viewer: Viewer,
+        orderService: OrderService
+    ) {
+        self.viewer = viewer
+        self.orderService = orderService
     }
 
-    private init() {}
+    func register(option: Option) {
+        options.append(option)
+    }
+
+    func run() {
+        while true {
+            guard let option = viewer.selectMenu(
+                title: "SHAKESHACK",
+                options: options,
+                receipt: orderService
+            ) else { return }
+
+            orderService.add(menu: option)
+        }
+    }
 }
