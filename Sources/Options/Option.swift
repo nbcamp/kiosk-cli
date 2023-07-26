@@ -7,6 +7,6 @@ protocol Option {
 
 extension Option {
     func info() -> String {
-        return "\(id). \(name)\t\t\t | \(desc)"
+        return "\(id). \(name.padding(toLength: 30, withPad: " ", startingAt: 0)) | \(desc)"
     }
 }
