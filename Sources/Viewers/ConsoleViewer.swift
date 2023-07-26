@@ -1,38 +1,25 @@
 import Foundation
 
 struct ConsoleViewer: Viewer {
-    func selectMenu(
-        title: String,
-        options: [Option],
-        receipt: Receipt
-    ) -> Option? {
-        guard let option = selectOption(
-            title: title,
-            options: options,
-            receipt: receipt
-        ) else { return nil }
-
-        if case let .category(name, _, options) = option {
-            return selectOption(
-                title: name,
-                options: options,
-                receipt: receipt
-            )
+    func printOptions(title: String, options: [Option]) {
+        print("[ ⭐️ WELCOME \(title) ⭐️ ]")
+        for option in options {
+            print("\(option.id). \(option.info)")
         }
-        return nil
+        print(String(repeating: "━", count: 80))
     }
 
-    private func selectOption(
-        title: String,
-        options: [Option],
-        receipt: Receipt
-    ) -> Option? {
-        print("[ ⭐️ \(title) MENU ⭐️ ]")
-        for (index, option) in options.enumerated() {
-            print("\(index + 1). \(option.info)")
+    func printMenus(title: String, menus: [Option]) {
+        print("[ 🍔 \(title) MENU 🥤 ]")
+        for menu in menus {
+            print("\(menu.id). \(menu.info)")
         }
+        print(String(repeating: "━", count: 80))
+    }
+
+    func printReceipt(receipt: Receipt) {
         if receipt.items.count > 0 {
-            print("\n[[ Shopping Bag ]]")
+            print("[ Shopping Bag ]")
             for (option, count) in receipt.items {
                 print("\(option.name) x \(count)")
             }
@@ -40,29 +27,43 @@ struct ConsoleViewer: Viewer {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
             if let total = formatter.string(for: receipt.total) {
-                print("Total Order Price: \(total) WON")
+                print("🧾 Total Order Price: \(total) WON")
             }
+            print(String(repeating: "━", count: 80))
         }
-        print()
-        print("0. Exit Program ")
-        print("-------------------")
-        let input = prompt("No. ") {
-            guard let num = Int($0) else { return false }
-            return num >= 0 && num <= options.count
-        }
-        print()
-        let index = Int(input)! - 1
-        return index >= 0 ? options[index] : nil
     }
 
-    private func prompt(_ message: String, validate: ((String) -> Bool)? = nil) -> String {
+    func selectCategory(categories: [Option]) -> Option {
+        let option: Option = prompt("No. ") {
+            guard let id = Int($0) else { return nil }
+            return categories.first { $0.id == id }
+        }
+        print()
+        return option
+    }
+
+    func selectMenu(menus: [Option]) -> Option? {
+        let option: Option = selectCategory(categories: menus)
+        if case .back = option { return nil }
+
+        print("👉 \(option.info)")
+        let answer: String = prompt("장바구니에 추가할까요? (Y/n): ") {
+            $0.isEmpty || $0.lowercased() == "y" || $0 == "n" ? $0 : nil
+        }
+        if answer == "n" {
+            print("취소하셨습니다.\n")
+            return nil
+        }
+        print()
+        return option
+    }
+
+    private func prompt<T>(_ message: String, transform: ((String) -> T?)? = nil) -> T {
         while true {
             print(message, terminator: "")
-            guard let input = readLine() else { return "" }
-            guard input.count > 0 else { continue }
-            guard validate?(input) != false else { continue }
-
-            return input
+            guard let input = readLine() else { return "" as! T }
+            guard let result = transform?(input) else { continue }
+            return result
         }
     }
 }

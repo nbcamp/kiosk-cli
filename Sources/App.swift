@@ -19,13 +19,15 @@ class App {
 
     func run() {
         while true {
-            guard let option = viewer.selectMenu(
-                title: "SHAKESHACK",
-                options: options,
-                receipt: orderService
-            ) else { return }
+            viewer.printOptions(title: "SHAKESHACK", options: options)
+            viewer.printReceipt(receipt: orderService)
+            let category = viewer.selectCategory(categories: options)
+            if case .exit = category { exit(0) }
 
-            orderService.add(menu: option)
+            viewer.printMenus(title: category.name, menus: category.menus)
+            guard let menu = viewer.selectMenu(menus: category.menus) else { continue }
+
+            orderService.add(menu: menu)
         }
     }
 }
