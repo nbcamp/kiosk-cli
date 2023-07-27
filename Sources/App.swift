@@ -46,7 +46,6 @@ class App {
                 } else if case let .action(attr) = action, attr.name == "Clear" {
                     orderService.removeAll()
                 }
-                
             }
         }
     }

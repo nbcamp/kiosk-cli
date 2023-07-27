@@ -7,6 +7,7 @@ struct ConsoleViewer: Viewer {
         options.forEach { print("\(format(option: $0))") }
         print("0. \(format(name: "Exit", desc: "프로그램을 종료합니다"))")
         divider()
+
         let input = prompt("No. ") {
             guard let id = Int($0) else { return false }
             return id == 0 || options.contains { $0.attr.id == id }
@@ -53,9 +54,7 @@ struct ConsoleViewer: Viewer {
             print("0. \(format(name: "Back", desc: "홈 화면으로 돌아갑니다."))")
             divider()
             print("품목 목록")
-            for (option, count) in receipt.items {
-                print("\(option.attr.name) x \(count)")
-            }
+            receipt.items.forEach { print("\($0.option.attr.name) x \($0.count)")  }
             print("\n🧾 Total Order Price: \(format(number: receipt.total)) WON")
             divider()
             let input = prompt("No. ") {
@@ -63,15 +62,15 @@ struct ConsoleViewer: Viewer {
                 return id == 0 || options.contains { $0.attr.id == id }
             }
             print()
+
             let id = Int(input)!
             if id == 0 { return nil }
             return options.first { $0.attr.id == id }
         } else {
-            print("0. \(format(name: "Back", desc: "홈 화면으로 돌아갑니다."))")
-            divider()
             print("장바구니가 비어있습니다. 품목을 선택해주세요.")
             divider()
-            print("No. 엔터를 눌러 홈 화면으로 돌아갑니다.")
+
+            print("엔터를 눌러 홈 화면으로 돌아갑니다.", terminator: " ")
             _ = readLine()
             return nil
         }

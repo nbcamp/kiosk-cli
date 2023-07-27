@@ -5,8 +5,8 @@ let app = App(
 app.register(option: .category(
     attr: Option.Attr(id: 1, name: "Burger", desc: "앵거스 비프 통살을 다져만든 버거"),
     menus: [
-        .menu(attr: Option.Attr(id: 2, name: "Shroom Burger", desc: "몬스터 치즈와 체다 치즈로 속을 채운 베지테리안 버거"), price: 9400),
         .menu(attr: Option.Attr(id: 1, name: "Shack Burger", desc: "토마토, 양상추, 쉑소스가 토핑된 치즈버거"), price: 6900),
+        .menu(attr: Option.Attr(id: 2, name: "Shroom Burger", desc: "몬스터 치즈와 체다 치즈로 속을 채운 베지테리안 버거"), price: 9400),
         .menu(attr: Option.Attr(id: 3, name: "Smoke Burger", desc: "베이컨, 체리 페퍼에 쉑소스가 토핑된 치즈버거"), price: 8900),
     ]))
 
