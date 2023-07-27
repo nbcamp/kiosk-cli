@@ -26,7 +26,7 @@ class OrderService: Receipt {
         }
     }
 
-    func order(money: Int) -> Bool {
-        return money >= total
+    func order(money: Int) -> Int {
+        return total - money
     }
 }

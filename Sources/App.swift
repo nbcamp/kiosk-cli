@@ -20,9 +20,8 @@ class App {
     func run() {
         while true {
             viewer.printOptions(title: "SHAKESHACK", options: options)
-            viewer.printReceipt(receipt: orderService)
-            let category = viewer.selectCategory(categories: options)
-            if case .exit = category { exit(0) }
+            viewer.printOrder(receipt: orderService)
+            guard let category = viewer.selectCategory(categories: options) else { return }
 
             viewer.printMenus(title: category.name, menus: category.menus)
             guard let menu = viewer.selectMenu(menus: category.menus) else { continue }
