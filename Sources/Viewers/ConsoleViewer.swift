@@ -42,19 +42,19 @@ struct ConsoleViewer: Viewer {
             print("취소하셨습니다.\n")
             return nil
         }
-        print()
+        print("정상적으로 추가되었습니다.\n")
         return menu
     }
 
     func selectOrder(title: String, options: [Option], receipt: Receipt) -> Option? {
-        print("[ Order Service  ]")
+        print("[ 🍕 Order List 💳 ]")
         divider()
         if receipt.items.count > 0 {
             options.forEach { print("\(format(option: $0))") }
             print("0. \(format(name: "Back", desc: "홈 화면으로 돌아갑니다."))")
             divider()
             print("품목 목록")
-            receipt.items.forEach { print("\($0.option.attr.name) x \($0.count)")  }
+            receipt.items.forEach { print("\($0.option.attr.name) x \($0.count)") }
             print("\n🧾 Total Order Price: \(format(number: receipt.total)) WON")
             divider()
             let input = prompt("No. ") {
@@ -72,6 +72,7 @@ struct ConsoleViewer: Viewer {
 
             print("엔터를 눌러 홈 화면으로 돌아갑니다.", terminator: " ")
             _ = readLine()
+            print()
             return nil
         }
     }
@@ -85,20 +86,26 @@ struct ConsoleViewer: Viewer {
         print()
     }
 
+    func printWaitingCount(count: Int) {
+        divider()
+        print("현재 대기 주문 대기 수: \(count)")
+        divider()
+    }
+
     private func format(option: Option) -> String {
         switch option {
         case let .category(attr, _),
              let .order(attr, _),
              let .action(attr):
-            return "\(attr.id). \(padEnd(attr.name)) │ \(attr.desc)"
+            return "\(attr.id). \(padEnd(attr.name)) ┃ \(attr.desc)"
         case let .menu(attr, price):
             let shortPrice = String(format: "%.1f", Double(price) / 1000.0)
-            return "\(attr.id). \(padEnd(attr.name)) │ W \(shortPrice) │ \(attr.desc)"
+            return "\(attr.id). \(padEnd(attr.name)) ┃ W \(shortPrice) ┃ \(attr.desc)"
         }
     }
 
     private func format(name: String, desc: String) -> String {
-        return "\(padEnd(name)) │ \(desc)"
+        return "\(padEnd(name)) ┃ \(desc)"
     }
 
     private func format(number: Int) -> String {

@@ -4,4 +4,5 @@ protocol Viewer {
     func selectOrder(title: String, options: [Option], receipt: Receipt) -> Option?
 
     func printPaymentResult(success: Bool)
+    func printWaitingCount(count: Int)
 }
