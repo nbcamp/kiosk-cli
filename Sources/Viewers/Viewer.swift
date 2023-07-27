@@ -1,8 +1,7 @@
 protocol Viewer {
-    func printOptions(title: String, options: [Option])
-    func printMenus(title: String, menus: [Option])
-    func printOrder(receipt: Receipt)
-
-    func selectCategory(categories: [Option]) -> Option?
-    func selectMenu(menus: [Option]) -> Option?
+    func selectCategory(title: String, options: [Option], receipt: Receipt) -> Option?
+    func selectMenu(title: String, options: [Option], receipt: Receipt) -> Option?
+    func selectOrder(title: String, options: [Option], receipt: Receipt) -> Option?
+    
+    func printPaymentResult(success: Bool)
 }

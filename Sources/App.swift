@@ -19,14 +19,35 @@ class App {
 
     func run() {
         while true {
-            viewer.printOptions(title: "SHAKESHACK", options: options)
-            viewer.printOrder(receipt: orderService)
-            guard let category = viewer.selectCategory(categories: options) else { return }
+            guard let option = viewer.selectCategory(
+                title: "SHAKESHACK",
+                options: options,
+                receipt: orderService
+            ) else { return }
 
-            viewer.printMenus(title: category.name, menus: category.menus)
-            guard let menu = viewer.selectMenu(menus: category.menus) else { continue }
+            if case let .category(attr, menus) = option {
+                guard let menu = viewer.selectMenu(
+                    title: attr.name,
+                    options: menus,
+                    receipt: orderService
+                ) else { continue }
 
-            orderService.add(menu: menu)
+                orderService.add(menu: menu)
+            } else if case let .order(attr, menus) = option {
+                guard let action = viewer.selectOrder(
+                    title: attr.name,
+                    options: menus,
+                    receipt: orderService
+                ) else { continue }
+
+                if case let .action(attr) = action, attr.name == "Buy" {
+                    _ = orderService.order(money: 999999)
+                    viewer.printPaymentResult(success: true)
+                } else if case let .action(attr) = action, attr.name == "Clear" {
+                    orderService.removeAll()
+                }
+                
+            }
         }
     }
 }

@@ -1,41 +1,46 @@
 import Foundation
 
 enum Option: Equatable, Hashable {
-    case category(id: Int, name: String, desc: String, menus: [Option])
-    case menu(id: Int, name: String, desc: String, price: Int)
+    struct Attr {
+        let id: Int
+        let name: String
+        let desc: String
+    }
+
+    case category(attr: Attr, menus: [Option])
+    case menu(attr: Attr, price: Int)
+
+    case order(attr: Attr, actions: [Option])
+    case action(attr: Attr)
 }
 
 extension Option {
-    var id: Int {
+    var attr: Attr {
         switch self {
-        case let .category(id, _, _, _),
-             let .menu(id, _, _, _):
-            return id
-        }
-    }
-
-    var name: String {
-        switch self {
-        case let .category(_, name, _, _),
-             let .menu(_, name, _, _):
-            return name
+        case let .category(attr, _),
+             let .menu(attr, _),
+             let .order(attr, _),
+             let .action(attr):
+            return attr
         }
     }
 
     var menus: [Option] {
         switch self {
-        case let .category(_, _, _, menus): return menus
+        case let .category(_, menus): return menus
         default: return []
         }
     }
 }
 
 extension Option {
+    static func == (lhs: Option, rhs: Option) -> Bool {
+        return "\(lhs.attr)" == "\(rhs.attr)"
+    }
+}
+
+extension Option {
     func hash(into hasher: inout Hasher) {
-        switch self {
-        case let .category(id, name, desc, _),
-             let .menu(id, name, desc, _):
-            hasher.combine("\(id) \(name) \(desc)")
-        }
+        hasher.combine("\(attr.id) \(attr.name) \(attr.desc)")
     }
 }

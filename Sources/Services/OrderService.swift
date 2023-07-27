@@ -3,7 +3,7 @@ class OrderService: Receipt {
 
     var total: Int {
         return bag.reduce(0) { result, option in
-            if case let .menu(_, _, _, price) = option {
+            if case let .menu(_, price) = option {
                 return result + price
             }
             return result
@@ -26,7 +26,15 @@ class OrderService: Receipt {
         }
     }
 
+    func removeAll() {
+        bag.removeAll()
+    }
+
     func order(money: Int) -> Int {
-        return total - money
+        let result = money - total
+        if result >= 0 {
+            removeAll()
+        }
+        return result
     }
 }

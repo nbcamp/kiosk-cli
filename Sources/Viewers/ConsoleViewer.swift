@@ -1,50 +1,39 @@
 import Foundation
 
 struct ConsoleViewer: Viewer {
-    func printOptions(title: String, options: [Option]) {
+    func selectCategory(title: String, options: [Option], receipt: Receipt) -> Option? {
         print("[ ⭐️ WELCOME \(title) ⭐️ ]")
-        options.forEach { print("\($0.id). \(format(option: $0))") }
-        print("0. \(format(name: "Exit", desc: "프로그램을 종료합니다."))")
         divider()
-    }
-
-    func printMenus(title: String, menus: [Option]) {
-        print("[ 🍔 \(title) MENU 🥤 ]")
-        menus.forEach { print("\($0.id). \(format(option: $0))") }
-        print("0. \(format(name: "Back", desc: "홈 화면으로 돌아갑니다."))")
+        options.forEach { print("\(format(option: $0))") }
+        print("0. \(format(name: "Exit", desc: "프로그램을 종료합니다"))")
         divider()
-    }
-
-    func printOrder(receipt: Receipt) {
-        if receipt.items.count > 0 {
-            print("[ Shopping Bag ]")
-            for (option, count) in receipt.items {
-                print("\(option.name) x \(count)")
-            }
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            if let total = formatter.string(for: receipt.total) {
-                print("\n🧾 Total Order Price: \(total) WON")
-            }
-            divider()
-        }
-    }
-
-    func selectCategory(categories: [Option]) -> Option? {
         let input = prompt("No. ") {
             guard let id = Int($0) else { return false }
-            return id == 0 || categories.contains { $0.id == id }
+            return id == 0 || options.contains { $0.attr.id == id }
         }
-
         print()
         let id = Int(input)!
-        return id == 0 ? nil : categories.first { $0.id == id }
+        if id == 0 { return nil }
+        return options.first { $0.attr.id == id }
     }
 
-    func selectMenu(menus: [Option]) -> Option? {
-        guard let menu = selectCategory(categories: menus) else { return nil }
+    func selectMenu(title: String, options: [Option], receipt: Receipt) -> Option? {
+        print("[ 🍔 \(title) MENU 🥤 ]")
+        divider()
+        options.forEach { print("\(format(option: $0))") }
+        print("0. \(format(name: "Back", desc: "홈 화면으로 돌아갑니다."))")
+        divider()
 
-        print("👉 \(format(option: menu))")
+        let input = prompt("No. ") {
+            guard let id = Int($0) else { return false }
+            return id == 0 || options.contains { $0.attr.id == id }
+        }
+        print()
+        let id = Int(input)!
+        if id == 0 { return nil }
+        guard let menu = options.first(where: { $0.attr.id == id }) else { return nil }
+
+        print("\(format(option: menu))")
         let answer = prompt("장바구니에 추가할까요? (Y/n): ") {
             $0.isEmpty || $0.lowercased() == "y" || $0 == "n"
         }
@@ -56,18 +45,67 @@ struct ConsoleViewer: Viewer {
         return menu
     }
 
+    func selectOrder(title: String, options: [Option], receipt: Receipt) -> Option? {
+        print("[ Order Service  ]")
+        divider()
+        if receipt.items.count > 0 {
+            options.forEach { print("\(format(option: $0))") }
+            print("0. \(format(name: "Back", desc: "홈 화면으로 돌아갑니다."))")
+            divider()
+            print("품목 목록")
+            for (option, count) in receipt.items {
+                print("\(option.attr.name) x \(count)")
+            }
+            print("\n🧾 Total Order Price: \(format(number: receipt.total)) WON")
+            divider()
+            let input = prompt("No. ") {
+                guard let id = Int($0) else { return false }
+                return id == 0 || options.contains { $0.attr.id == id }
+            }
+            print()
+            let id = Int(input)!
+            if id == 0 { return nil }
+            return options.first { $0.attr.id == id }
+        } else {
+            print("0. \(format(name: "Back", desc: "홈 화면으로 돌아갑니다."))")
+            divider()
+            print("장바구니가 비어있습니다. 품목을 선택해주세요.")
+            divider()
+            print("No. 엔터를 눌러 홈 화면으로 돌아갑니다.")
+            _ = readLine()
+            return nil
+        }
+    }
+
+    func printPaymentResult(success: Bool) {
+        if success {
+            print("결제가 정상적으로 처리되었습니다. 감사합니다.")
+        } else {
+            print("잔액 부족으로 결제에 실패했습니다.")
+        }
+        print()
+    }
+
     private func format(option: Option) -> String {
         switch option {
-        case let .category(_, name, desc, _):
-            return "\(padEnd(name)) │ \(desc)"
-        case let .menu(_, name, desc, price):
-            let p = String(format: "%.1f", Double(price) / 1000.0)
-            return "\(padEnd(name)) │ W \(p) │ \(desc)"
+        case let .category(attr, _),
+             let .order(attr, _),
+             let .action(attr):
+            return "\(attr.id). \(padEnd(attr.name)) │ \(attr.desc)"
+        case let .menu(attr, price):
+            let shortPrice = String(format: "%.1f", Double(price) / 1000.0)
+            return "\(attr.id). \(padEnd(attr.name)) │ W \(shortPrice) │ \(attr.desc)"
         }
     }
 
     private func format(name: String, desc: String) -> String {
         return "\(padEnd(name)) │ \(desc)"
+    }
+
+    private func format(number: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(for: number)!
     }
 
     private func padEnd(_ str: String, length: Int = 30) -> String {
