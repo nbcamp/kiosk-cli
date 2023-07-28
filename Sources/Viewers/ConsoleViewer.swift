@@ -114,7 +114,7 @@ struct ConsoleViewer: Viewer {
         return formatter.string(for: number)!
     }
 
-    private func padEnd(_ str: String, length: Int = 30) -> String {
+    private func padEnd(_ str: String, length: Int = 22) -> String {
         return str.padding(toLength: length, withPad: " ", startingAt: 0)
     }
 
